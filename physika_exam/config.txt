@@ -1,0 +1,1 @@
+{"reader_info": {"img_proc_count": 163, "precision": 0.64}, "users": {"lyuseg": {"id": "624240509", "role": "admin"}, "ChikiBubilda": {"id": "767987898", "role": "user"}, "JeasusChrist": {"id": "831541868", "role": "user"}, "Maks_Gnatyuk": {"id": "735050137", "role": "user"}, "wanrltq": {"id": "338161212", "role": "user"}, "TheSheva6207": {"id": "1043684610", "role": "user"}}}
