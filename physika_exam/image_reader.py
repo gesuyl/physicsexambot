@@ -34,16 +34,6 @@ class ImageReader:
         txt += "\n------------"
         return txt
 
-    # def save_config(self):
-    #     # {"admins": ["0"], "info" : {"img_proc_count": 0}, "allowed_users": []}
-    #     conf = {
-    #         "reader_info": {"img_proc_count": self.img_count},
-    #         "users": self.users
-    #     }
-
-        # with open('config.txt', 'w')as f:
-        #     f.write(dumps(conf))
-        # print('Saved config successfully')
 
     async def compare(self, file):
         recog_text = self.recognize(f"{os.path.dirname(os.path.realpath(__file__))}\\img_processing\\{file}.jpg")
