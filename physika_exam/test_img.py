@@ -13,7 +13,6 @@ import codecs
 from time import time
 
 
-# nlp = spacy.load('ru_core_news_lg')
 def main_vars():
     STORED_IMAGES_FOLDER = f"{os.path.dirname(os.path.realpath(__file__))}\\img_processing\\stored_images"
     IMG_PATH = f"{os.path.dirname(os.path.realpath(__file__))}\\img_processing"
