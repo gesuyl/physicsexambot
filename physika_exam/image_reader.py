@@ -1,27 +1,28 @@
+from main import db
+from const import pytesseract, IMG_PATH
+import os
+from PIL import Image
 
 
 class ImageReader:
-    def __init__(self, ls):
-        self.img_count: int = ls[0]
-        self.admins: list = get_admins(ls[1])
-        self.users: dict = ls[1]
+    def __init__(self):
         self.processor: object = pytesseract
+        self.users: dict = {user.username: {"id": user.id,
+                                            "username":user.username,
+                                            "role": user.role
+                                            }
+                            for user in db.get_all_users()
+                            }
+        self.admins: list = [user for user in self.users.values() if user["role"] == "Admin"]
+        self.img_count: int = db.get_image_processing_count()
+        self.precision: float = db.get_precision()
+        self.photo_text_dict: dict = db.get_image_data()
+        self.working_img_dir: str = IMG_PATH if os.path.exists(IMG_PATH) else (os.mkdir(IMG_PATH), IMG_PATH)
 
-        if os.path.exists(IMG_PATH):
-            self.img_directory = IMG_PATH
-        else:
-            os.mkdir(IMG_PATH)
-            self.img_directory = IMG_PATH
-        with codecs.open('photo_text_dict.txt', 'r', 'utf-8') as f:
-            # {"file_name":"text"}
-            self.photo_text_dict: dict = literal_eval(f.read())
-
-    def __str__(self):
-        return 'ok'
 
     def recognize(self, image_path):
-        self.img_count += 1
         return self.processor.image_to_string(Image.open(image_path), lang='ukr+eng')
+
 
     def return_info(self):
         admins = '\n'.join(self.admins)
@@ -33,16 +34,16 @@ class ImageReader:
         txt += "\n------------"
         return txt
 
-    def save_config(self):
-        # {"admins": ["0"], "info" : {"img_proc_count": 0}, "allowed_users": []}
-        conf = {
-            "reader_info": {"img_proc_count": self.img_count},
-            "users": self.users
-        }
+    # def save_config(self):
+    #     # {"admins": ["0"], "info" : {"img_proc_count": 0}, "allowed_users": []}
+    #     conf = {
+    #         "reader_info": {"img_proc_count": self.img_count},
+    #         "users": self.users
+    #     }
 
-        with open('config.txt', 'w')as f:
-            f.write(dumps(conf))
-        print('Saved config successfully')
+        # with open('config.txt', 'w')as f:
+        #     f.write(dumps(conf))
+        # print('Saved config successfully')
 
     async def compare(self, file):
         recog_text = self.recognize(f"{os.path.dirname(os.path.realpath(__file__))}\\img_processing\\{file}.jpg")
