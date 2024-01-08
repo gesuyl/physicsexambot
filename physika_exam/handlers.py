@@ -1,7 +1,7 @@
 from aiogram import types
 # from aiogram.dispatcher.filters import Command
 from utility import check_init, delete_button, answer_kb
-from main import dp, tesseract_reader
+from main import dp, tesseract_reader, db
 
 @dp.message_handler(commands='info', commands_prefix='!/')
 async def info(message):
@@ -24,10 +24,9 @@ async def add(message):
 
     print(message.__dict__)
     if message.reply_to_message.from_user.username not in tesseract_reader.users.keys():
-        tesseract_reader.users[message.reply_to_message.from_user.username].update({
-            "id": message.reply_to_message.from_user.id,
-            "role": "user"
-        })
+        db.add_user(id=message.reply_to_message.from_user.id,
+                    username=message.reply_to_message.from_user.username,
+                    role="user")
         txt = f"Added @{message.reply_to_message.from_user.username}"
     else:
         txt = f"@{message.reply_to_message.from_user.username} is already on the list"
