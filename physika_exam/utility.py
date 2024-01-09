@@ -1,8 +1,5 @@
-from ast import literal_eval
-from json import dumps
-from copy import copy
-from image_reader import ImageReader
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 
 
 def remove_control_chars(s):
@@ -11,7 +8,12 @@ def remove_control_chars(s):
     return s.translate(translator)
 
 
+def admin_check(username, reader): return str(username) in reader.admins
+
+def access_check(username, reader): return str(username) in reader.users.keys 
+
 class Keyboard:
+
     @staticmethod
     def answer_kb(dd, current_file_name):
         dd.pop(current_file_name, None)
