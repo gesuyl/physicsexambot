@@ -1,19 +1,23 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, Text, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Float, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+
+
 Base = declarative_base()
 
+
 class Database:
+
     def __init__(self, db_url):
         self.engine = create_engine(db_url, echo=True)
         Base.metadata.create_all(bind=self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
 
-    def add_user(self, username, role):
+    def add_user(self, id, username, role):
         with self.Session() as session:
-            user = Users(username=username, role=role)
+            user = Users(id=id, username=username, role=role)
             session.add(user)
             session.commit()
 
@@ -24,7 +28,13 @@ class Database:
             session.add(image_data)
             session.commit()
 
-    
+
+    def save_image_data_batch(self, image_data_list):
+        with self.Session() as session:
+            session.bulk_save_objects(image_data_list)
+            session.commit()
+
+
     def get_image_data(self, image_id=None):
         with self.Session() as session:
             if image_id:
@@ -40,11 +50,11 @@ class Database:
             else:
                 return session.query(Users).all()
 
-    def update_image_processing_count(self, count, precision):
+    def update_attr(self, count=None, precision=None):
         with self.Session() as session:
             conf = session.query(MainConf).first()
-            conf.img_proc_count = count
-            conf.precision = precision
+            if count: conf.img_proc_count = count
+            if precision: conf.precision = precision
             session.commit()
 
 
