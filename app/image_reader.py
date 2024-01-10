@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from tabulate import tabulate
-from config_reader import config
+from config_reader import settings
 from utils import remove_control_chars
 from database import ImageData
 
@@ -15,14 +15,14 @@ from database import ImageData
 
 class ImageReader:
     def __init__(self, dbase):
-        self.processor: object = ImgProcConstants.TESSERACT_CMD
+        self.processor: object = settings.TESSERACT_CMD
         self.db = dbase
-        # pytesseract.pytesseract.tesseract_cmd = ImgProcConstants.TESSERACT_CMD
-        if os.path.exists(ImgProcConstants.IMG_PATH):
-            self.working_img_dir: str = ImgProcConstants.IMG_PATH
+        # pytesseract.pytesseract.tesseract_cmd = settings.TESSERACT_CMD
+        if os.path.exists(settings.IMG_PATH):
+            self.working_img_dir: str = settings.IMG_PATH
         else:
-            os.mkdir(ImgProcConstants.IMG_PATH)
-            self.working_img_dir: str = ImgProcConstants.IMG_PATH
+            os.mkdir(settings.IMG_PATH)
+            self.working_img_dir: str = settings.IMG_PATH
 
 
     def update_info(self):
@@ -44,9 +44,9 @@ class ImageReader:
         tabulate_headers = ["Filename", "Confidence", "Recognized Text"]
         first_iter = True
 
-        for file_name in os.listdir(ImgProcConstants.STORED_IMAGES_FOLDER):
+        for file_name in os.listdir(settings.STORED_IMAGES_FOLDER):
             if file_name.endswith('.jpg'):
-                image_path = os.path.join(ImgProcConstants.STORED_IMAGES_FOLDER, file_name)
+                image_path = os.path.join(settings.STORED_IMAGES_FOLDER, file_name)
 
                 if first_iter:
                     first_iter = False
