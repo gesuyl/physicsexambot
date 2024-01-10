@@ -1,9 +1,10 @@
+import logging
 from sqlalchemy import create_engine, Column, Integer, String, Float, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
-
+logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR)
 Base = declarative_base()
 
 
@@ -60,12 +61,19 @@ class Database:
 
     def get_image_processing_count(self):
         with self.Session() as session:
-            return session.query(MainConf).first().img_proc_count
-
+            main_conf = session.query(MainConf).first()
+            if main_conf:
+                return main_conf.img_proc_count
+            else:
+                return 0
 
     def get_precision(self):
         with self.Session() as session:
-            return session.query(MainConf).first().precision
+            main_conf = session.query(MainConf).first()
+            if main_conf:
+                return main_conf.precision
+            else:
+                return 0
         
 
 class ImageData(Base):
