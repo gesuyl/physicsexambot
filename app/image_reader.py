@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from tabulate import tabulate
-from const import ImgProcConstants
+from config_reader import config
 from utils import remove_control_chars
 from database import ImageData
 

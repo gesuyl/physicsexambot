@@ -1,20 +1,20 @@
 from aiogram import types
+from aiogram.filters.command import Command
 import os
-from utility import access_check, admin_check, Keyboard
+from utils import access_check, admin_check, Keyboard
 from main import dp, tesseract_reader, db, bot
-from const import STORED_IMAGES_FOLDER
+from config_reader import config
 
 
 
-@dp.message_handler(commands='info', commands_prefix='!/')
+@dp.message(Command('info'))
 async def info(message):
-    await bot.send_message(chat_id=message.chat.id,
-                           text=tesseract_reader.return_info(),
-                           parse_mode='HTML',
-                           reply_markup=Keyboard.delete_button())
+    await message.answer(text=tesseract_reader.return_info(),
+                         parse_mode='HTML',
+                         reply_markup=Keyboard.delete_button())
 
 
-@dp.message_handler(commands='fill_db', commands_prefix='!/')
+@dp.message_handler(Command('fill_db'))
 async def fill_db(message):
     if not admin_check(message.from_user.username, tesseract_reader):
         await bot.send_message(chat_id=message.chat.id,
