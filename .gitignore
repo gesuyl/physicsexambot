@@ -1,1 +1,11 @@
 physika_exam/start.sh
+physika_exam/implement_later.py
+physika_exam/test_img.py
+physexambot.db
+physika_exam/.DS_Store
+physika_exam/__pycache__/const.cpython-311.pyc
+physika_exam/__pycache__/database.cpython-311.pyc
+physika_exam/__pycache__/image_reader.cpython-311.pyc
+physika_exam/__pycache__/main.cpython-311.pyc
+physika_exam/__pycache__/utility.cpython-311.pyc
+physika_exam/__pycache__/utils.cpython-311.pyc
