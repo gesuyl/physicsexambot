@@ -1,28 +1,32 @@
 #!/usr/bin/python3
-from aiogram import Bot, Dispatcher
-from os import getenv
-import asyncio
-from image_reader import ImageReader
-from database import Database
-from config_reader import config
+from datetime import datetime
+from asyncio import run as asyncio_run
+#
+from config.app_context import app_context
+from handlers import commands, images
 
 
-def main():
-    db_url = "sqlite:///physexambot.db"
-    db = Database(db_url)
 
-    tesseract_reader = ImageReader(db)
-    tesseract_reader.update_info()
+def main() -> tuple:
+    db = app_context.db
+    tesseract_reader = app_context.tesseract_reader
+    bot = app_context.bot
+    dispatcher = app_context.dispatcher
 
-    bot = Bot(token=config.BOT_TOKEN.get_secret_value(), parse_mode='HTML')
-    dispatcher = Dispatcher()
+    dispatcher.include_routers([commands.router, images.router])
 
     return dispatcher, bot
 
+
 async def poll(dp, bot):
     print("Starting polling...")
+
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
+
 
 if __name__ == '__main__':
     dp, bot = main()
-    asyncio.run(poll(dp, bot))
+    dp["started_at"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    asyncio_run(poll(dp, bot))
