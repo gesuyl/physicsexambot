@@ -2,8 +2,8 @@
 from datetime import datetime
 from asyncio import run as asyncio_run
 #
-from config.app_context import app_context
-from handlers import commands, images
+from app.config.app_context import app_context
+from app.handlers import commands, images
 
 
 
@@ -13,7 +13,7 @@ def main() -> tuple:
     bot = app_context.bot
     dispatcher = app_context.dispatcher
 
-    dispatcher.include_routers([commands.router, images.router])
+    dispatcher.include_routers(commands.router, images.router)
 
     return dispatcher, bot
 
