@@ -4,7 +4,7 @@ from aiogram import Router, F
 from aiogram.filters.command import Command
 #
 from main import tesseract_reader, db, bot
-from config_reader import settings
+from app.config.config import settings
 from app.utils.keyboard import Keyboard
 from app.utils.utils import access_check, admin_check, Keyboard
 

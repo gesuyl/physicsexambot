@@ -1,13 +1,5 @@
-app/start.sh
-app/implement_later.py
-app/test_img.py
 physexambot.db
 .env
-app/__pycache__/config_reader.cpython-311.pyc
-app/__pycache__/const.cpython-311.pyc
-app/__pycache__/database.cpython-311.pyc
-app/__pycache__/image_reader.cpython-311.pyc
-app/__pycache__/main.cpython-311.pyc
-app/__pycache__/utility.cpython-311.pyc
-app/__pycache__/utils.cpython-311.pyc
+**/__pycache__
 .DS_Store
+

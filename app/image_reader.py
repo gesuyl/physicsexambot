@@ -7,22 +7,23 @@ import cv2
 import numpy as np
 from PIL import Image
 from tabulate import tabulate
-from config_reader import settings
-from utils import remove_control_chars
+#
+from app.config.config import settings
+from utils.utils import remove_control_chars
 from database import ImageData
 
 
 
 class ImageReader:
     def __init__(self, dbase):
-        self.processor: object = settings.TESSERACT_CMD
+        self.processor: object = settings.TESSERACT_BIN
         self.db = dbase
         # pytesseract.pytesseract.tesseract_cmd = settings.TESSERACT_CMD
-        if os.path.exists(settings.IMG_PATH):
-            self.working_img_dir: str = settings.IMG_PATH
+        if os.path.exists(settings.PROC_IMAGES_FOLDER):
+            self.proc_image_folder: str = settings.PROC_IMAGES_FOLDER
         else:
-            os.mkdir(settings.IMG_PATH)
-            self.working_img_dir: str = settings.IMG_PATH
+            os.mkdir(settings.PROC_IMAGES_FOLDER)
+            self.proc_image_folder: str = settings.PROC_IMAGES_FOLDER
 
 
     def update_info(self):
@@ -36,6 +37,8 @@ class ImageReader:
         self.img_count: int = self.db.get_image_processing_count()
         self.precision: float = self.db.get_precision()
         self.photo_text_dict: dict = self.db.get_image_data()
+
+        print('ImageReader info updated')
 
 
     def fill_db(self):

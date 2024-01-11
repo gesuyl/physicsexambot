@@ -40,7 +40,7 @@ print('Reading config...')
 settings = Settings()
 
 if not settings.TESSERACT_BIN:
-    print('Tesseract binary path not set')
+    print('Tesseract binary path not set in .env file')
     Settings.set_tesseract_bin()
     settings.TESSERACT_BIN = Settings.TESSERACT_BIN
 

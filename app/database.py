@@ -5,13 +5,13 @@ from sqlalchemy.orm import sessionmaker
 
 
 logging.getLogger('sqlalchemy.engine').setLevel(logging.CRITICAL)
-Base = declarative_base()
 
 
 class Database:
 
     def __init__(self, db_url):
         self.engine = create_engine(db_url, echo=True)
+        Base = declarative_base()
         Base.metadata.create_all(bind=self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
