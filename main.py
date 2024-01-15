@@ -8,8 +8,6 @@ from app.handlers import commands, images
 
 
 def main() -> tuple:
-    db = app_context.db
-    tesseract_reader = app_context.tesseract_reader
     bot = app_context.bot
     dispatcher = app_context.dispatcher
 
@@ -18,7 +16,7 @@ def main() -> tuple:
     return dispatcher, bot
 
 
-async def poll(dp, bot):
+async def poll(dp, bot) -> None:
     print("Starting polling...")
 
     await bot.delete_webhook(drop_pending_updates=True)
