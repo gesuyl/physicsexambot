@@ -1,7 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
-
 class Keyboard:
 
     @staticmethod
@@ -24,8 +23,9 @@ class Keyboard:
 
     @staticmethod
     def add_delete_button(keyboard: InlineKeyboardMarkup = None):
+        buttons = [[InlineKeyboardButton(text='❌', callback_data='delete')]]
         if keyboard is None:
-            keyboard = InlineKeyboardMarkup()
-
-        keyboard.add(InlineKeyboardButton(text='❌', callback_data='delete'))
+            keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
+        else:
+            keyboard.add(*buttons)
         return keyboard
