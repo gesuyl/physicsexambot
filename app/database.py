@@ -14,6 +14,14 @@ class ImageData(Base):
     recog_text = Column(Text)
 
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "file_name": self.file_name,
+            "recog_text": self.recog_text
+            }
+
+
 class Users(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -22,7 +30,11 @@ class Users(Base):
 
 
     def to_dict(self):
-        return {"id": self.id, "username": self.username, "role": self.role}
+        return {
+            "id": self.id,
+            "username": self.username,
+            "role": self.role
+            }
 
 
 class MainConf(Base):
@@ -68,7 +80,7 @@ class Database:
             session.commit()
 
 
-    def get_image_data(self, image_id=None):
+    def get_images(self, image_id=None):
         with self.Session() as session:
             if image_id:
                 return session.query(ImageData).filter_by(id=image_id).first()
