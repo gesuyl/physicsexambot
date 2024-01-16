@@ -6,29 +6,45 @@ from app.config.app_context import app_context
 from app.utils.wrappers import check_superadmin_access
 
 
+
 router = Router()
 
 
-
-
-@router.message(Command('read_db_users'))
+@router.message(Command("read_db"))
 @check_superadmin_access
-async def read_db_users(message: types.Message):
-    users = app_context.tesseract_reader.db.get_users()
-    msg = "==USERS==\n"
+async def read_db(message: types.Message):
+    subcommand = message.text.split(" ")[1].lower()
 
-    for user in users:
-        user_desc = "\n".join([f"<b>{key}</b>: {value}" for key, value in user.to_dict().items()])
-        msg += f"{user_desc}\n"
+    if subcommand == "users":
+        records = app_context.tesseract_reader.db.get_users()
+        header = "====DB_USERS===="
+    elif subcommand == "images":
+        records = app_context.tesseract_reader.db.get_images()
+        header = "====DB_IMAGES===="
+    else:
+        await message.answer(
+            text="Invalid subcommand. Use 'users' or 'images'."
+        )
+        return
+
+    msg = f"{header}\n"
+
+    for record in records:
+        record_desc = "\n".join(
+            [f"<b>{key}</b>: {value}" for key, value in record.to_dict().items()]
+        )
+        msg += f"{record_desc}\n"
         msg += "---\n"
 
-    await message.answer(text=msg)
+    await message.answer(
+        text=msg
+    )
 
 
-@router.message(Command('delete'))
+@router.message(Command("delete"))
 @check_superadmin_access
 async def delete(message: types.Message):
-    user_to_delete = message.text.split(" ")[1]
+    user_to_delete = message.text.split(" ")[1].lower()
 
     app_context.tesseract_reader.db.delete_user(username=user_to_delete)
 
@@ -39,7 +55,7 @@ async def delete(message: types.Message):
     app_context.tesseract_reader.update_info()
 
 
-@router.message(Command('fill_db'))
+@router.message(Command("fill_db"))
 @check_superadmin_access
 async def fill_db(message: types.Message):
     await message.answer(
@@ -55,7 +71,7 @@ async def fill_db(message: types.Message):
     app_context.tesseract_reader.update_info()
 
 
-@router.message(Command('drop_table'))
+@router.message(Command("drop_table"))
 @check_superadmin_access
 async def drop_db(message: types.Message):
     table_to_drop = message.text.split(" ")[1]
