@@ -12,5 +12,7 @@ class AppContext:
         self.bot = Bot(token=settings.BOT_TOKEN.get_secret_value(), parse_mode='HTML')
         self.dispatcher = Dispatcher()
 
+        print("[#] AppContext created")
+
 
 app_context = AppContext()

@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
+
 Base = declarative_base()
 
 
@@ -18,6 +19,7 @@ class Users(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
     role = Column(String)
+
 
     def to_dict(self):
         return {"id": self.id, "username": self.username, "role": self.role}
@@ -36,11 +38,13 @@ class Database:
         Base.metadata.create_all(bind=self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
+
     def add_user(self, id, username, role):
         with self.Session() as session:
             user = Users(id=id, username=username, role=role)
             session.add(user)
             session.commit()
+
 
     def delete_user(self, username):
         with self.Session() as session:
@@ -50,16 +54,19 @@ class Database:
             session.delete(user)
             session.commit()
 
+
     def save_image_data(self, file_name, recog_text):
         with self.Session() as session:
             image_data = ImageData(file_name=file_name, recog_text=recog_text)
             session.add(image_data)
             session.commit()
 
+
     def save_image_data_batch(self, image_data_list):
         with self.Session() as session:
             session.bulk_save_objects(image_data_list)
             session.commit()
+
 
     def get_image_data(self, image_id=None):
         with self.Session() as session:
@@ -68,12 +75,14 @@ class Database:
             else:
                 return session.query(ImageData).all()
 
+
     def get_users(self, username=None):
         with self.Session() as session:
             if username:
                 return session.query(Users).filter_by(username=username).first()
             else:
                 return session.query(Users).all()
+
 
     def update_attr(self, count=None, precision=None):
         with self.Session() as session:
@@ -84,6 +93,7 @@ class Database:
                 conf.precision = precision
             session.commit()
 
+
     def get_image_processing_count(self):
         with self.Session() as session:
             main_conf = session.query(MainConf).first()
@@ -91,12 +101,14 @@ class Database:
                 return main_conf.img_proc_count
             return 0
 
+
     def get_precision(self):
         with self.Session() as session:
             main_conf = session.query(MainConf).first()
             if main_conf:
                 return main_conf.precision
             return 0
+
 
     def drop_table(self, db_name):
         Base.metadata.drop_all(bind=self.engine, tables=[db_name])
