@@ -32,11 +32,10 @@ async def time(message: types.Message, started_at: str):
 
 @router.message(Command("users"))
 @check_admin_access
-async def cmd_hello(message: types.Message):
+async def users(message: types.Message):
     users_message = f"""
 Users: {app_context.tesseract_reader.users}\n
-Admins: {app_context.tesseract_reader.admins}\n
-Superadmin: {app_context.tesseract_reader.super_admin}"""
+Admins: {app_context.tesseract_reader.admins}\n"""
 
     await message.answer(
         text=users_message
@@ -45,7 +44,7 @@ Superadmin: {app_context.tesseract_reader.super_admin}"""
 
 @router.message(Command('add'))
 @check_admin_access
-async def add_user(message):
+async def add(message):
     if message.reply_to_message.from_user.username not in app_context.tesseract_reader.users.keys():
         app_context.tesseract_reader.db.add_user(
             id=message.reply_to_message.from_user.id,
