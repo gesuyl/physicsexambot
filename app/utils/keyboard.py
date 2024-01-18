@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
+
 class Keyboard:
 
     @staticmethod
@@ -9,7 +10,9 @@ class Keyboard:
         next_file_name = min(dd, key=dd.get, default='last')
 
         buttons = [
-            [InlineKeyboardButton(text='Правильно?', callback_data='None')],
+            [
+                InlineKeyboardButton(text='Правильно?', callback_data='None')
+            ],
             [
                 InlineKeyboardButton(text='✅', callback_data='correct'),
                 InlineKeyboardButton(text='❌', callback_data=f'not_correct#{next_file_name}')
@@ -19,13 +22,31 @@ class Keyboard:
         keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
 
         return keyboard
-    
+
 
     @staticmethod
     def add_delete_button(keyboard: InlineKeyboardMarkup = None):
-        buttons = [[InlineKeyboardButton(text='❌', callback_data='delete')]]
+        buttons = [
+            [
+                InlineKeyboardButton(text='❌', callback_data='delete')
+            ]
+        ]
+
         if keyboard is None:
             keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
         else:
             keyboard.add(*buttons)
+        return keyboard
+
+
+    @staticmethod
+    def yes_no_keyboard(command):
+        buttons = [
+            [
+                InlineKeyboardButton(text='Yes', callback_data=f'{command}_yes'),
+                InlineKeyboardButton(text='No', callback_data=f'{command}_no')
+            ]
+        ]
+
+        keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
         return keyboard
