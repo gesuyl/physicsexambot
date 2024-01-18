@@ -1,6 +1,7 @@
 from aiogram import types, Router, F
 from aiogram.filters.command import Command
 #
+from app.config.config import settings
 from app.config.app_context import app_context
 from app.utils.wrappers import check_superadmin_access
 from app.utils.keyboard import Keyboard
@@ -9,19 +10,22 @@ from app.utils.keyboard import Keyboard
 router = Router()
 
 
-@router.message(Command("read_db"))
+@router.message(Command("read_table"))
 @check_superadmin_access
-async def read_db(message: types.Message):
+async def read_table(message: types.Message):
     subcommand = message.text.split(" ")[1].lower()
 
     if subcommand == "users":
         records = app_context.tesseract_reader.db.get_users()
-        header = "====DB_USERS===="
+        header = "|======= USERS =======|"
     elif subcommand == "images":
         records = app_context.tesseract_reader.db.get_images()
-        header = "====DB_IMAGES===="
+        header = "|======= IMAGES =======|"
+    elif subcommand == "main_conf":
+        records = app_context.tesseract_reader.db.get_main_conf()
+        header = "|======= MAIN_CONF =======|"
     else:
-        await message.answer(text="Invalid subcommand. Use 'users' or 'images'.")
+        await message.answer(text="Invalid table name. Use 'users', 'images', or 'main_conf'.")
 
         return
 
@@ -65,29 +69,32 @@ async def delete(message: types.Message):
     app_context.tesseract_reader.update_info()
 
 
-@router.message(Command("fill_db"))
+@router.message(Command("fill_images"))
 @check_superadmin_access
-async def fill_db(message: types.Message):
-
+async def fill_table(message: types.Message):
     await message.answer(
-        text="Filling DB with pre-processed OCR data.\nDo you want the output to be verbose? <b>(Y/N)</b>",
-        reply_markup=Keyboard.yes_no_keyboard('fill_db_verbose')
+        text=f"Filling 'images' table with pre-processed OCR data.\nSource folder: <i>{settings.STORED_IMAGES_FOLDER}</i>\nDo you want the output to be verbose?\n<b>(Y/N)</b>",
+        reply_markup=Keyboard.yes_no_keyboard('fill_table_verbose')
     )
 
 
 @router.message(Command("empty_table"))
 @check_superadmin_access
-async def drop_db(message: types.Message):
+async def drop_table(message: types.Message):
     table_to_drop = message.text.split(" ")[1]
-    app_context.tesseract_reader.db.empty_table(table_name=table_to_drop)
 
-    await message.answer(text=f"Emptied '{table_to_drop}' table.")
+    if not app_context.tesseract_reader.db.table_exists(table_name=table_to_drop):
+        await message.answer(text=f"The table '{table_to_drop}' does not exist.")
+    else:
+        rows_in_table = app_context.tesseract_reader.db.get_row_count(table_name=table_to_drop)
+        await message.answer(
+            text=f"Are you sure you want to empty '{table_to_drop}' table? It has {rows_in_table} rows of data.\n<b>(Y/N)</b>",
+            reply_markup=Keyboard.yes_no_keyboard('empty_table')
+        )
 
-    app_context.tesseract_reader.update_info()
 
-
-@router.callback_query(F.data == "fill_db_verbose_yes")
-async def fill_db_verbose(callback: types.CallbackQuery):
+@router.callback_query(F.data == "fill_table_verbose_yes")
+async def fill_table_verbose(callback: types.CallbackQuery):
     await callback.message.answer(
         text="Filling DB with pre-processed OCR data.\n"
              "Console verbosity: <b>Yes</b>\n\n"
@@ -95,7 +102,7 @@ async def fill_db_verbose(callback: types.CallbackQuery):
              "\nFor more info, check the console."
     )
 
-    app_context.tesseract_reader.fill_db(verbose=True)
+    app_context.tesseract_reader.fill_table(verbose=True)
     app_context.tesseract_reader.update_info()
 
     await callback.answer(
@@ -104,8 +111,8 @@ async def fill_db_verbose(callback: types.CallbackQuery):
     )
 
 
-@router.callback_query(F.data == "fill_db_verbose_no")
-async def fill_db_nonverbose(callback: types.CallbackQuery):
+@router.callback_query(F.data == "fill_table_verbose_no")
+async def fill_table_nonverbose(callback: types.CallbackQuery):
     await callback.message.answer(
         text="Filling DB with pre-processed OCR data.\n"
              "Console verbosity: <b>No</b>\n\n"
@@ -113,10 +120,39 @@ async def fill_db_nonverbose(callback: types.CallbackQuery):
              "\nFor more info, check the console."
     )
 
-    app_context.tesseract_reader.fill_db(verbose=False)
+    app_context.tesseract_reader.fill_table(verbose=False)
     app_context.tesseract_reader.update_info()
 
     await callback.answer(
         text="Done!",
         show_alert=True
+    )
+
+
+@router.callback_query(F.data == "empty_table_yes")
+async def empty_table_yes(callback: types.CallbackQuery):
+    table_to_drop = callback.message.text.split(" ")[7].strip("'")
+
+    if app_context.tesseract_reader.db.table_exists(table_name=table_to_drop):
+        app_context.tesseract_reader.db.empty_table(table_name=table_to_drop)
+    
+        app_context.tesseract_reader.update_info()
+    else:
+        await callback.message.answer(
+            text=f"The table '{table_to_drop}' does not exist."
+        )
+
+        return
+
+    await callback.message.answer(
+        text=f"Table '{table_to_drop}' emptied."
+    )
+
+
+
+@router.callback_query(F.data == "empty_table_no")
+async def empty_table_no(callback: types.CallbackQuery):
+    table_to_drop = callback.message.text.split(" ")[-3]
+    await callback.message.answer(
+        text=f"Table {table_to_drop} not emptied."
     )
