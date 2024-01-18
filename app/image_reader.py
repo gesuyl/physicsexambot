@@ -9,7 +9,7 @@ from PIL import Image
 #
 from app.config.config import settings
 from app.utils.utils import remove_control_chars, progress_bar
-from app.database import ImageData
+from app.database import Images
 
 
 
@@ -50,10 +50,10 @@ class ImageReader:
             ][0]
             self.admins.append(self.super_admin)
 
+        attributes = [attributes.to_dict() for attributes in self.db.get_main_conf()]
+        self.img_count, self.precision = attributes[0]["img_proc_count"], attributes[0]["precision"]
         images = [image_instance.to_dict() for image_instance in self.db.get_images()]
         self.photo_text_dict = {image["file_name"]: image["recog_text"] for image in images}
-        self.img_count = self.db.get_image_processing_count()
-        self.precision = self.db.get_precision()
 
         print("[#] ImageReader info updated")
 
@@ -63,7 +63,7 @@ class ImageReader:
         self.admins.append(self.super_admin)
 
 
-    def fill_db(self, verbose=False) -> None:
+    def fill_table(self, verbose=False) -> None:
         files_to_work = os.listdir(settings.STORED_IMAGES_FOLDER)
         approx_time = round(len(files_to_work)*3, 2)
         print(
@@ -110,7 +110,7 @@ class ImageReader:
                 recognized_text = " ".join(result["text"])
 
                 image_data_list.append(
-                    ImageData(file_name=file_name, recog_text=recognized_text)
+                    Images(file_name=file_name, recog_text=recognized_text)
                 )
 
                 self.photo_text_dict[file_name] = recognized_text
@@ -120,7 +120,7 @@ class ImageReader:
         self.db.update_attr(count=self.img_count)
 
         print(
-            "[#] Filling complete, DB updated.\n"
+            f"[#] Filling complete, processed {len(files_to_work)} images\n"
             f"+{'='*72}+"
         )
 
@@ -183,18 +183,7 @@ class ImageReader:
 
 
     def recognize_text(self, image) -> dict:
-        ukrainian_letters_upper = ''.join(chr(i) for i in range(1040, 1072))
-        ukrainian_letters_lower = ''.join(chr(i) for i in range(1072, 1104))
-        english_letters_upper = ''.join(chr(i) for i in range(65, 91))
-        english_letters_lower = ''.join(chr(i) for i in range(97, 123))
-        numbers = ''.join(chr(i) for i in range(48, 58))
-        
-        whitelist = (
-            english_letters_upper + english_letters_lower +
-            ukrainian_letters_upper + ukrainian_letters_lower +
-            numbers + ".,:?()<>+-=_%"
-        )
-        config = f'--oem 3 --psm 12 -c tessedit_char_whitelist={whitelist}'
+        config = f'--oem 3 --psm 12'
 
         return pytesseract.image_to_data(
             image,
@@ -212,7 +201,7 @@ class ImageReader:
             f"Allowed Users:\n<b>{''.join(users_info)}</b>" if users_info else ""
         )
 
-        return f"------------\nImages processed: <b>{self.img_count}</b>\n{admins_info}{users_to_print}\n------------"
+        return f"------------\nImages processed: <b>{self.img_count}</b>\nPrecision: <b>{self.precision}</b>\n{admins_info}{users_to_print}\n------------"
 
 
     async def compare(self, file) -> dict:
