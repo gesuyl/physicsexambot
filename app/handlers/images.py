@@ -5,7 +5,6 @@ from aiogram.filters.command import Command
 #
 from app.config.config import settings
 from app.utils.keyboard import Keyboard
-from app.utils.utils import access_check, admin_check
 from app.config.app_context import app_context
 
 

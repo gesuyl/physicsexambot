@@ -24,10 +24,8 @@ async def info(message: types.Message):
 @router.message(Command('time'))
 @check_admin_access
 async def time(message: types.Message, started_at: str):
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
-    await message.answer(
-        text=f"Bot started: <b>{started_at}</b> \nCurrent server time: <b>{current_time}</b>"
-    )
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    await message.answer(text=f"Bot started: <b>{started_at}</b> \nCurrent server time: <b>{current_time}</b>")
 
 
 @router.message(Command("users"))
@@ -35,11 +33,10 @@ async def time(message: types.Message, started_at: str):
 async def users(message: types.Message):
     users_message = f"""
 Users: {app_context.tesseract_reader.users}\n
-Admins: {app_context.tesseract_reader.admins}\n"""
+Admins: {app_context.tesseract_reader.admins}
+"""
 
-    await message.answer(
-        text=users_message
-    )
+    await message.answer(text=users_message)
 
 
 @router.message(Command('add'))
