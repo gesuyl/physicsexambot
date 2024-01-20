@@ -9,13 +9,25 @@ Base = declarative_base()
 
 
 class Images(Base):
+    """
+    Class for Images table
+
+    id: int
+    file_name: str
+    recog_text: str
+    """
     __tablename__ = "images"
     id = Column(Integer, primary_key=True)
     file_name = Column(String, nullable=False)
     recog_text = Column(Text)
 
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """
+        Convert object to dict
+
+        :return: dict
+        """
         return {
             "id": self.id,
             "file_name": self.file_name,
@@ -24,13 +36,25 @@ class Images(Base):
 
 
 class Users(Base):
+    """
+    Class for Users table
+    
+    id: int
+    username: str
+    role: str
+    """
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
     username = Column(String, unique=True)
     role = Column(String)
 
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """
+        Convert object to dict
+
+        :return: dict
+        """
         return {
             "id": self.id,
             "username": self.username,
@@ -39,21 +63,43 @@ class Users(Base):
 
 
 class MainConf(Base):
+    """
+    Class for MainConf table
+
+    img_proc_count: int
+    precision: float
+    """
     __tablename__ = "main_conf"
     id = Column(Integer, primary_key=True)
     img_proc_count = Column(Integer)
     precision = Column(Float)
 
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
+        """
+        Convert object to dict
+
+        :return: dict
+        """
         return {
             "img_proc_count": self.img_proc_count,
             "precision": self.precision,
             }
-    
+
 
 class Database:
-    def __init__(self, db_url):
+    """
+    Class for database
+
+    engine: object
+    sessionmaker: object
+    """
+    def __init__(self, db_url: str) -> None:
+        """
+        Initialize database
+        
+        :param db_url: str
+        """
         self.engine = create_engine(db_url)      
         self.sessionmaker = sessionmaker(bind=self.engine)
         Base.metadata.create_all(bind=self.engine)
@@ -67,7 +113,14 @@ class Database:
         print("[#] Database connected")
 
 
-    def add_user(self, id, username, role):
+    def add_user(self, id: int, username: str, role: str) -> None:
+        """
+        Add user to database
+        
+        :param id: int
+        :param username: str
+        :param role: str
+        """
         with self.sessionmaker() as session:
             user = Users(
                 id=id,
@@ -78,7 +131,12 @@ class Database:
             session.commit()
 
 
-    def delete_user(self, username):
+    def delete_user(self, username: str) -> None:
+        """
+        Delete user from database
+
+        :param username: str
+        """
         with self.sessionmaker() as session:
             user = session.query(Users).filter_by(username=username).first()
             if not user:
@@ -87,7 +145,13 @@ class Database:
             session.commit()
 
 
-    def save_image_data(self, file_name, recog_text):
+    def save_image_data(self, file_name: str, recog_text: str) -> None:
+        """
+        Save image data to database
+
+        :param file_name: str
+        :param recog_text: str
+        """
         with self.sessionmaker() as session:
             images = Images(
                 file_name=file_name,
@@ -97,13 +161,23 @@ class Database:
             session.commit()
 
 
-    def save_image_data_batch(self, image_data_list):
+    def save_image_data_batch(self, image_data_list: list) -> None:
+        """
+        Save batch image data to database
+
+        :param image_data_list: list
+        """
         with self.sessionmaker() as session:
             session.bulk_save_objects(image_data_list)
             session.commit()
 
 
-    def get_images(self, image_id=None):
+    def get_images(self, image_id: int = None) -> list:
+        """
+        Get image data from database
+        
+        :param image_id: int
+        """
         with self.sessionmaker() as session:
             if image_id:
                 return session.query(Images).filter_by(id=image_id).first()
@@ -111,7 +185,12 @@ class Database:
                 return session.query(Images).all()
 
 
-    def get_users(self, username=None):
+    def get_users(self, username: str = None) -> list:
+        """
+        Get user data from database
+
+        :param username: str
+        """
         with self.sessionmaker() as session:
             if username:
                 return session.query(Users).filter_by(username=username).first()
@@ -119,7 +198,13 @@ class Database:
                 return session.query(Users).all()
 
 
-    def update_attr(self, count=None, precision=None):
+    def update_attr(self, count: int = None, precision: float = None) -> None:
+        """
+        Update image count or precision in MainConf table
+
+        :param count: int
+        :param precision: float
+        """
         with self.sessionmaker() as session:
             conf = session.query(MainConf).first()
             if count:
@@ -129,13 +214,23 @@ class Database:
             session.commit()
 
 
-    def get_main_conf(self):
+    def get_main_conf(self) -> list:
+        """
+        Get main configuration from database
+
+        :return: list
+        """
         with self.sessionmaker() as session:
             return session.query(MainConf).all()
 
 
 
-    def empty_table(self, table_name):
+    def empty_table(self, table_name: str) -> None:
+        """
+        Empty table by table name
+
+        :param table_name: str
+        """
         table_to_empty = Base.metadata.tables.get(table_name)
 
         with self.sessionmaker() as session:
@@ -143,13 +238,26 @@ class Database:
             session.commit()
 
 
-    def table_exists(self, table_name):
+    def table_exists(self, table_name: str) -> bool:
+        """
+        Check if table exists
+
+        :param table_name: str
+
+        :return: bool
+        """
         insp = inspect(self.engine)
 
         return insp.has_table(table_name)
 
 
-    def get_row_count(self, table_name):
+    def get_row_count(self, table_name: str) -> int:
+        """
+        Get row count from table
+
+        :param table_name: str
+
+        :return: int
+        """
         with self.sessionmaker() as session:            
             return session.query(func.count(f"{table_name}.id")).scalar()
-

@@ -12,7 +12,12 @@ router = Router()
 
 @router.message(Command("read_table"))
 @check_superadmin_access
-async def read_table(message: types.Message):
+async def read_table(message: types.Message) -> None:
+    """
+    Read chosen table from database
+
+    :param message: aiogram.types.Message
+    """
     subcommand = message.text.split(" ")[1].lower()
 
     if subcommand == "users":
@@ -57,7 +62,12 @@ async def read_table(message: types.Message):
 
 @router.message(Command("delete"))
 @check_superadmin_access
-async def delete(message: types.Message):
+async def delete(message: types.Message) -> None:
+    """
+    Delete user from database
+    
+    :param message: aiogram.types.Message
+    """
     user_to_delete = message.text.split(" ")[1].lower()
 
     app_context.tesseract_reader.db.delete_user(username=user_to_delete)
@@ -71,16 +81,28 @@ async def delete(message: types.Message):
 
 @router.message(Command("fill_images"))
 @check_superadmin_access
-async def fill_table(message: types.Message):
+async def fill_table(message: types.Message) -> None:
+    """
+    Fill 'images' table with pre-processed OCR data
+
+    :param message: aiogram.types.Message
+    """
     await message.answer(
-        text=f"Filling 'images' table with pre-processed OCR data.\nSource folder: <i>{settings.STORED_IMAGES_FOLDER}</i>\nDo you want the output to be verbose?\n<b>(Y/N)</b>",
+        text=f"Filling 'images' table with pre-processed OCR data.\n"
+             f"Source folder: <i>{settings.STORED_IMAGES_FOLDER}</i>\n"
+             f"Do you want the output to be verbose?",
         reply_markup=Keyboard.yes_no_keyboard('fill_table_verbose')
     )
 
 
 @router.message(Command("empty_table"))
 @check_superadmin_access
-async def drop_table(message: types.Message):
+async def drop_table(message: types.Message) -> None:
+    """
+    Empty chosen table
+
+    :param message: aiogram.types.Message
+    """
     table_to_drop = message.text.split(" ")[1]
 
     if not app_context.tesseract_reader.db.table_exists(table_name=table_to_drop):
@@ -94,7 +116,12 @@ async def drop_table(message: types.Message):
 
 
 @router.callback_query(F.data == "fill_table_verbose_yes")
-async def fill_table_verbose(callback: types.CallbackQuery):
+async def fill_table_verbose(callback: types.CallbackQuery) -> None:
+    """
+    Callback handler, fills 'images' table with pre-processed OCR data (verbose)
+    
+    :param callback: aiogram.types.CallbackQuery
+    """
     await callback.message.answer(
         text="Filling DB with pre-processed OCR data.\n"
              "Console verbosity: <b>Yes</b>\n\n"
@@ -112,7 +139,12 @@ async def fill_table_verbose(callback: types.CallbackQuery):
 
 
 @router.callback_query(F.data == "fill_table_verbose_no")
-async def fill_table_nonverbose(callback: types.CallbackQuery):
+async def fill_table_nonverbose(callback: types.CallbackQuery) -> None:
+    """
+    Callback handler, fills 'images' table with pre-processed OCR data (non-verbose)
+
+    :param message: aiogram.types.Message
+    """
     await callback.message.answer(
         text="Filling DB with pre-processed OCR data.\n"
              "Console verbosity: <b>No</b>\n\n"
@@ -130,7 +162,12 @@ async def fill_table_nonverbose(callback: types.CallbackQuery):
 
 
 @router.callback_query(F.data == "empty_table_yes")
-async def empty_table_yes(callback: types.CallbackQuery):
+async def empty_table_yes(callback: types.CallbackQuery) -> None:
+    """
+    Callback handler, empties chosen table
+
+    :param callback: aiogram.types.CallbackQuery
+    """
     table_to_drop = callback.message.text.split(" ")[7].strip("'")
 
     if app_context.tesseract_reader.db.table_exists(table_name=table_to_drop):
@@ -151,7 +188,12 @@ async def empty_table_yes(callback: types.CallbackQuery):
 
 
 @router.callback_query(F.data == "empty_table_no")
-async def empty_table_no(callback: types.CallbackQuery):
+async def empty_table_no(callback: types.CallbackQuery) -> None:
+    """
+    Callback handler, does not empty chosen table
+
+    :param callback: aiogram.types.CallbackQuery
+    """
     table_to_drop = callback.message.text.split(" ")[-3]
     await callback.message.answer(
         text=f"Table {table_to_drop} not emptied."

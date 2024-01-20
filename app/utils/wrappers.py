@@ -4,8 +4,15 @@ from app.config.app_context import app_context
 
 
 
-def check_superadmin_access(func) -> bool:
-    async def wrapper(message: types.Message):
+def check_superadmin_access(func: types.Message) -> bool:
+    """
+    Check if user is superadmin
+    
+    :param func: types.Message
+    
+    :return: bool
+    """
+    async def wrapper(message: types.Message) -> None:
         if message.from_user.username != app_context.tesseract_reader.super_admin:
             await message.answer(
                 text="This function is only available to the superadmin."
@@ -15,7 +22,14 @@ def check_superadmin_access(func) -> bool:
     return wrapper
 
 
-def check_admin_access(func) -> bool:
+def check_admin_access(func: types.Message) -> bool:
+    """
+    Check if user is admin
+    
+    :param func: types.Message
+    
+    :return: bool
+    """
     async def wrapper(message: types.Message):
         if message.from_user.username not in app_context.tesseract_reader.admins:
             await message.answer(
@@ -26,7 +40,14 @@ def check_admin_access(func) -> bool:
     return wrapper
 
 
-def check_access(func) -> bool:
+def check_access(func: types.Message) -> bool:
+    """
+    Check if user has general access
+
+    :param func: types.Message
+
+    :return: bool
+    """
     async def wrapper(message: types.Message):
         if message.from_user.username not in app_context.tesseract_reader.users.keys:
             await message.answer(

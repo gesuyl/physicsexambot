@@ -1,4 +1,9 @@
-def name_ascii_art():
+def name_ascii_art() -> str:
+    """
+    Print app name in ASCII art
+
+    :return: str
+    """
     return r"""
 ____________________________________________________________________________________________________________________________________________________________________________
           _____                                            _____                    _____                    _____                   _______               _____          
@@ -26,14 +31,32 @@ ________________________________________________________________________________
 ____________________________________________________________________________________________________________________________________________________________________________
         """
 
-def remove_control_chars(s) -> str:
+
+def clean_text(text: str) -> str:
+    """
+    Clean text from special characters
+
+    :param text: str
+
+    :return: str
+    """
+    text = text.replace(" ", "")
     escapes = ''.join([chr(char) for char in range(1, 32)])
     translator = str.maketrans('', '', escapes)
-    return s.translate(translator)
+    return text.translate( translator)
 
 
-# taken from https://stackoverflow.com/questions/6169217/replace-console-output-in-python
-def progress_bar(current, total, bar_length=40):
+def progress_bar(current: int, total: int, bar_length: int = 40) -> str:
+    """
+    Taken from https://stackoverflow.com/questions/6169217/replace-console-output-in-python
+    Create progress bar
+
+    :param current: int
+    :param total: int
+    :param bar_length: int
+
+    :return: str
+    """
     fraction = current / total
 
     arrow = int(fraction * bar_length - 1) * '=' + '>'

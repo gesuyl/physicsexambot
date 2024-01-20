@@ -8,14 +8,20 @@ import numpy as np
 from PIL import Image
 #
 from app.config.config import settings
-from app.utils.utils import remove_control_chars, progress_bar
+from app.utils.utils import clean_text, progress_bar
 from app.database import Images
 
 
 
 class ImageReader:
-    def __init__(self, dbase) -> None:
+    def __init__(self, dbase: object) -> None:
+        """
+        Constructor that initializes ImageReader object
+        
+        :param dbase: object
+        """
         # self.processor: object = settings.TESSERACT_BIN
+        # pytesseract.pytesseract.tesseract_cmd = settings.TESSERACT_BIN
         self.db = dbase
         self.users: dict = {}
         self.admins: list = []
@@ -24,7 +30,6 @@ class ImageReader:
         self.img_count: int = 0
         self.precision: float = 0
 
-        # pytesseract.pytesseract.tesseract_cmd = settings.TESSERACT_BIN
         if os.path.exists(settings.PROC_IMAGES_FOLDER):
             self.proc_image_folder: str = settings.PROC_IMAGES_FOLDER
         else:
@@ -33,6 +38,9 @@ class ImageReader:
 
 
     def update_info(self) -> None:
+        """
+        Update ImageReader info
+        """
         self.users = {
             user.username: {"id": user.id, "role": user.role}
             for user in self.db.get_users()
@@ -58,12 +66,22 @@ class ImageReader:
         print("[#] ImageReader info updated")
 
 
-    def add_superadmin(self, username) -> None:
+    def add_superadmin(self, username: str) -> None:
+        """
+        Add superadmin to ImageReader object
+
+        :param username: str
+        """
         self.super_admin = username
         self.admins.append(self.super_admin)
 
 
-    def fill_table(self, verbose=False) -> None:
+    def fill_table(self, verbose: bool = False) -> None:
+        """
+        Fill database with OCR data
+
+        :param verbose: bool
+        """
         files_to_work = os.listdir(settings.STORED_IMAGES_FOLDER)
         approx_time = round(len(files_to_work)*3, 2)
         print(
@@ -125,7 +143,15 @@ class ImageReader:
         )
 
 
-    def preprocess_image(self, image_path, fxfy=2) -> np.ndarray:
+    def preprocess_image(self, image_path: str, fxfy: int = 2) -> np.ndarray:
+        """
+        Preprocess image
+
+        :param image_path: str
+        :param fxfy: int
+
+        :return: np.ndarray
+        """
         try:
             img = cv2.imread(image_path)
 
@@ -158,7 +184,14 @@ class ImageReader:
         return denoised_image
 
 
-    def evaluate_ocr_parameters(self, image_path) -> tuple:
+    def evaluate_ocr_parameters(self, image_path: str) -> tuple:
+        """
+        Evaluate OCR parameters
+
+        :param image_path: str
+
+        :return: tuple
+        """
         start_total_time = time.time()
         best_confidence = 0
 
@@ -182,18 +215,28 @@ class ImageReader:
         return best_confidence, best_scale_factor, total_time
 
 
-    def recognize_text(self, image) -> dict:
-        config = f'--oem 3 --psm 12'
+    def recognize_text(self, image: np.ndarray) -> dict:
+        """
+        Recognize text from image
 
+        :param image: np.ndarray
+
+        :return: dict
+        """
         return pytesseract.image_to_data(
             image,
             lang="ukr+eng",
-            config=config,
+            config='--oem 3 --psm 12',
             output_type="dict"
         )
 
 
     def return_info(self) -> str:
+        """
+        Return info about users, admins, images processed, and precision
+
+        :return: str
+        """
         admins_info = f"Admins:\n<b>{''.join(self.admins)}</b>\n" if self.admins else ""
 
         users_info = [user for user in self.users.keys() if user not in self.admins]
@@ -202,17 +245,24 @@ class ImageReader:
         )
 
         return f"------------\nImages processed: <b>{self.img_count}</b>\nPrecision: <b>{self.precision}</b>\n{admins_info}{users_to_print}\n------------"
+        
+    
+    def compare(self, file: str) -> dict:
+        """
+        Compare recognized text with text from database
+        
+        :param file: str
 
-
-    async def compare(self, file) -> dict:
-        recog_text = self.recognize_text(
-            Image.open(
-                f"{os.path.dirname(os.path.realpath(__file__))}\\img_processing\\{file}.jpg"
-            )
+        :return: dict
+        FIXME: This method is not working properly
+        """
+        recognized_text = self.recognize_text(
+            Image.open(f"{os.path.dirname(os.path.realpath(__file__))}\\img_processing\\{file}.jpg")
         )["text"]
-        recog_text_no_spaces = recog_text.replace(" ", "")
+
+        recog_text_no_spaces = recognized_text
         chars_recog_text_no_spaces = [
-            char for char in remove_control_chars(recog_text_no_spaces)
+            char for char in clean_text(recog_text_no_spaces)
         ]
         diff_dict = {}
         work_with_dict = self.photo_text_dict
