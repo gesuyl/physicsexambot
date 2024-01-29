@@ -1,9 +1,9 @@
 from aiogram import Bot, Dispatcher
-#
+
 from app.database import Database
 from app.image_reader import ImageReader
-from .config import settings
 
+from .config import settings
 
 
 class AppContext:

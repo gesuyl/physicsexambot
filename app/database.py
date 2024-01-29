@@ -1,14 +1,12 @@
-from sqlalchemy import create_engine, inspect, func
-from sqlalchemy import Column, Integer, String, Float, Text
+from sqlalchemy import (Column, Float, Integer, String, Text, create_engine,
+                        func, inspect)
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
-
 
 Base = declarative_base()
 
 
-class Images(Base):
+class ImagesTable(Base):
     """
     Class for Images table
 
@@ -153,7 +151,7 @@ class Database:
         :param recog_text: str
         """
         with self.sessionmaker() as session:
-            images = Images(
+            images = ImagesTable(
                 file_name=file_name,
                 recog_text=recog_text
             )
@@ -180,9 +178,9 @@ class Database:
         """
         with self.sessionmaker() as session:
             if image_id:
-                return session.query(Images).filter_by(id=image_id).first()
+                return session.query(ImagesTable).filter_by(id=image_id).first()
             else:
-                return session.query(Images).all()
+                return session.query(ImagesTable).all()
 
 
     def get_users(self, username: str = None) -> list:

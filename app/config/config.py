@@ -1,7 +1,8 @@
 import os
 from platform import system
-from pydantic_settings import BaseSettings, SettingsConfigDict
+
 from pydantic import SecretStr
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):

@@ -1,11 +1,10 @@
-from aiogram import types, Router, F
+from aiogram import F, Router, types
 from aiogram.filters.command import Command
-#
-from app.config.config import settings
-from app.config.app_context import app_context
-from app.utils.wrappers import check_superadmin_access
-from app.utils.keyboard import Keyboard
 
+from app.config.app_context import app_context
+from app.config.config import settings
+from app.utils.keyboard import Keyboard
+from app.utils.wrappers import check_superadmin_access
 
 router = Router()
 

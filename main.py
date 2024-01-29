@@ -1,15 +1,15 @@
 #!/usr/bin/python3
-from datetime import datetime
 from asyncio import run as asyncio_run
-from aiogram import Dispatcher
-#
-# Print app name in ASCII art
-from app.utils.utils import name_ascii_art
-print(name_ascii_art())
-#rest of the imports
-from app.config.app_context import app_context
-from app.handlers import superadmin_commands, admin_commands, commands, images
+from datetime import datetime
 
+from aiogram import Dispatcher
+
+from app.utils.utils import name_ascii_art
+
+print(name_ascii_art())
+
+from app.config.app_context import app_context
+from app.handlers import admin_commands, commands, images, superadmin_commands
 
 
 def setup_routes() -> Dispatcher:

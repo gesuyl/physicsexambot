@@ -1,7 +1,6 @@
 from aiogram import types
-#
-from app.config.app_context import app_context
 
+from app.config.app_context import app_context
 
 
 def check_superadmin_access(func: types.Message) -> bool:

@@ -1,16 +1,16 @@
 import os
 import time
-from datetime import datetime
 from copy import copy
-import pytesseract
+from datetime import datetime
+
 import cv2
 import numpy as np
+import pytesseract
 from PIL import Image
-#
-from app.config.config import settings
-from app.utils.utils import clean_text, progress_bar
-from app.database import Images
 
+from app.config.config import settings
+from app.database import ImagesTable
+from app.utils.utils import clean_text, progress_bar
 
 
 class ImageReader:
@@ -128,7 +128,7 @@ class ImageReader:
                 recognized_text = " ".join(result["text"])
 
                 image_data_list.append(
-                    Images(file_name=file_name, recog_text=recognized_text)
+                    ImagesTable(file_name=file_name, recog_text=recognized_text)
                 )
 
                 self.photo_text_dict[file_name] = recognized_text
@@ -244,7 +244,7 @@ class ImageReader:
             f"Allowed Users:\n<b>{''.join(users_info)}</b>" if users_info else ""
         )
 
-        return f"------------\nImages processed: <b>{self.img_count}</b>\nPrecision: <b>{self.precision}</b>\n{admins_info}{users_to_print}\n------------"
+        return f"------------\nImagesTable processed: <b>{self.img_count}</b>\nPrecision: <b>{self.precision}</b>\n{admins_info}{users_to_print}\n------------"
         
     
     def compare(self, file: str) -> dict:
